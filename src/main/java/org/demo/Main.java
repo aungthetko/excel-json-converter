@@ -9,11 +9,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String[] amounts = {"1000", "2000"};
-        String excelFilePath = "src/main/resources/MPT.xlsx";
+        String[] amounts = {"1000", "2000", "3000", "5000", "10000", "20000", "30000"};
+        String excelFilePath = "src/main/resources/MPT_TEST.xlsx";
         JSONArray dataPacksArray = new JSONArray();
         JSONArray categoryArray = new JSONArray();
         JSONArray categoryArray2 = new JSONArray();
@@ -56,15 +60,32 @@ public class Main {
                                         categoryObject.put("amount", cell.getNumericCellValue());
                                         categoryObject.put("validity", "");
                                         break;
+                                    case 5:
+                                        categoryObject.put("packageOrder", cell.getNumericCellValue());
+                                        break;
                                 }
                             }
                         }
                         category.put("order", 2);
                         category.put("categoryName", "Data");
                         category.put("categoryIcon", "https://i.ibb.co/89LFNZ9/data-3x.png");
-                        category.put("category", categoryArray);
                         categoryArray.put(categoryObject);
+
                     }
+                    List<JSONObject> jsonList = new ArrayList<>();
+                    for(int i = 0; i < categoryArray.length(); i++){
+                        jsonList.add(categoryArray.getJSONObject(i));
+                    }
+                    Collections.sort(jsonList, new Comparator<JSONObject>() {
+                        @Override
+                        public int compare(JSONObject o1, JSONObject o2) {
+                            return Integer.compare(o1.getInt("packageOrder"),
+                                    o2.getInt("packageOrder"));
+                        }
+                    });
+                    JSONArray sortedJsonArray = new JSONArray(jsonList);
+                    category.put("category", sortedJsonArray);
+                    System.out.print(category);
                 } else if (sheet.getSheetName().equalsIgnoreCase("Voice")) {
                     for(int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++){
                         Row row = sheet.getRow(rowIndex);
@@ -92,7 +113,7 @@ public class Main {
                         }
                         category2.put("order", 3);
                         category2.put("categoryName", "Voice");
-                        category2.put("categoryIcon", "https://i.ibb.co/89LFNZ9/data-3x.png");
+                        category2.put("categoryIcon", "https://i.ibb.co/RTw9ZsV/voice-3x.png");
                         category2.put("category", categoryArray2);
                         categoryArray2.put(categoryObject);
                     }
@@ -122,8 +143,8 @@ public class Main {
                             }
                         }
                         category3.put("order", 4);
-                        category3.put("categoryName", "Voice");
-                        category3.put("categoryIcon", "https://i.ibb.co/89LFNZ9/data-3x.png");
+                        category3.put("categoryName", "Gaming");
+                        category3.put("categoryIcon", "https://i.ibb.co/g7cKfH6/entertainment-3x.png");
                         category3.put("category", categoryArray3);
                         categoryArray3.put(categoryObject);
                     }
@@ -154,7 +175,7 @@ public class Main {
                         }
                         category4.put("order", 5);
                         category4.put("categoryName", "Entertainment");
-                        category4.put("categoryIcon", "https://i.ibb.co/89LFNZ9/data-3x.png");
+                        category4.put("categoryIcon", "https://i.ibb.co/GC4Q9bd/htaw-B-package-3x.png");
                         category4.put("category", categoryArray4);
                         categoryArray4.put(categoryObject);
                     }
@@ -186,7 +207,7 @@ public class Main {
                         }
                         category4.put("order", 5);
                         category4.put("categoryName", "Entertainment");
-                        category4.put("categoryIcon", "https://i.ibb.co/89LFNZ9/data-3x.png");
+                        category4.put("categoryIcon", "https://i.ibb.co/RTw9ZsV/voice-3x.png");
                         category4.put("category", categoryArray4);
                         categoryArray4.put(categoryObject);
                     }
@@ -255,15 +276,16 @@ public class Main {
                 }
             }
             dataPacksArray.put(category);
-            dataPacksArray.put(category2);
-            dataPacksArray.put(category3);
-            dataPacksArray.put(category6);
-            dataPacksArray.put(category5);
-            dataPacksArray.put(category6);
+
+//            dataPacksArray.put(category2);
+//            dataPacksArray.put(category3);
+//            dataPacksArray.put(category6);
+//            dataPacksArray.put(category5);
+//            dataPacksArray.put(category6);
             dataPacks.put("dataPacks", dataPacksArray);
             mainObject.put("regex", "^(?:09|9)(7[01])\\\\d{4}$|^(?:09|9)(?:2[0-4]|5[0-6]|8[13-7]|8[19])\\\\d{5}$|^(?:09)(?:8[18])\\\\d{5}$|^(?:09|9)(?:4[1379]|73|91)\\\\d{6}$|^(?:09|9)(?:2[56]|4[0245]|8[789])\\\\d{7}$");
             mainObject.put("dataPacks", dataPacksArray);
-            mainObject.put("amount", amounts);
+            mainObject.put("amounts", amounts);
             mainObject.put("othersEnabled", Boolean.valueOf("false"));
             mainObject.put("name", "MPT");
             mainObject.put("icon", "https://files.wavemoney.io:8199/operators/MyTel.jpg");
@@ -273,7 +295,7 @@ public class Main {
             mainObject.put("othersErrorMessage", otherMessageObject);
             mainObject.put("othersRegex", "");
             mainObject.put("offerType", "standard");
-            System.out.println(mainObject.toString());
+//            System.out.println(dataPacksArray.toString());
         }catch (Exception e){
             e.printStackTrace();
         }
